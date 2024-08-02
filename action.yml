@@ -37,6 +37,13 @@ runs:
         WORLD_NAME: ${{ inputs.world_name }}
         ACCESS_TOKEN: ${{ inputs.access_token }}
       run: |
+        echo $WORLD_NAME
+        echo $WORLD_NAME
+        echo $WORLD_NAME
+        echo $WORLD_NAME
+        echo $WORLD_NAME
+        echo $WORLD_NAME
+        echo $WORLD_NAME
         response=$(curl --location "https://api.helixgame.com/v1/worlds/${WORLD_NAME}" --header "Token: ${ACCESS_TOKEN}")
         echo $response
         echo "world_id=$(echo $response | jq -r '.payload.id')" >> $GITHUB_OUTPUT
