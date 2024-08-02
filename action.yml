@@ -72,5 +72,5 @@ runs:
         curl --location 'https://api.helixgame.com/v1/world/upload/packages/finish' \
           --header "Content-Type: application/json" \
           --header "Token: ${ACCESS_TOKEN}" \
-          --data "{\"url\": \"${WORLD_URL}\",\"name\": \"${WORLD_ID}\"}"
+          --data "{\"url\": \"${WORLD_URL}\",\"world_id\": \"${WORLD_ID}\"}"
 
