@@ -1,0 +1,75 @@
+name: 'Deploy Helix World'
+description: 'Uploads a Helix automatically'
+inputs:
+  access_token:
+    description: 'Access token for authentication. Can be generated at Account -> Settings'
+    required: true
+    type: string
+  world_name:
+    description: 'Name of the world to upload. Make sure you already have this world created'
+    required: true
+    type: string
+outputs: {}
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install jq
+      shell: bash
+      run: sudo apt-get install -y jq
+
+    - name: Remove .files
+      shell: bash
+      run: |
+        rm -rf .git
+        rm -rf .github
+
+    - name: Zip repository
+      shell: bash
+      run: zip -r main.zip Packages
+
+    - name: Get World ID
+      id: get_world_id
+      shell: bash
+      env:
+        WORLD_NAME: ${{ inputs.world_name }}
+        ACCESS_TOKEN: ${{ inputs.access_token }}
+      run: |
+        response=$(curl --location "https://api.helixgame.com/v1/worlds/${WORLD_NAME}" --header "Token: ${ACCESS_TOKEN}")
+        echo "world_id=$(echo $response | jq -r '.payload.id')" >> $GITHUB_OUTPUT
+
+    - name: Request presigned URL
+      id: presigned_url
+      shell: bash
+      env:
+        ACCESS_TOKEN: ${{ inputs.access_token }}
+        WORLD_ID: ${{ steps.presigned_url.outputs.get_world_id.world_id }}
+      run: |
+        response=$(curl --location "https://api.helixgame.com/v1/worlds/upload/packages/${WORLD_ID}" \
+          --header "Token: ${ACCESS_TOKEN}")
+        echo "upload_url=$(echo $response | jq -r '.payload.upload_url')" >> $GITHUB_OUTPUT
+        echo "world_url=$(echo $response | jq -r '.payload.world_url')" >> $GITHUB_OUTPUT
+
+    - name: Upload zip file
+      shell: bash
+      env:
+        UPLOAD_URL: ${{ steps.presigned_url.outputs.upload_url }}
+      run: |
+        curl --location --request PUT "${UPLOAD_URL}" \
+          --header "Content-Type: application/zip" \
+          --data-binary "@main.zip"
+
+    - name: Finish upload
+      shell: bash
+      env:
+        ACCESS_TOKEN: ${{ inputs.access_token }}
+        WORLD_URL: ${{ steps.presigned_url.outputs.world_url }}
+        WORLD_ID: ${{ steps.presigned_url.outputs.get_world_id.world_id }}
+      run: |
+        curl --location 'https://api.helixgame.com/v1/worlds/upload/packages/finish' \
+          --header "Content-Type: application/json" \
+          --header "Token: ${ACCESS_TOKEN}" \
+          --data "{\"url\": \"${WORLD_URL}\",\"name\": \"${WORLD_ID}\"}"
+
