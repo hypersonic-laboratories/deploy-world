@@ -37,15 +37,7 @@ runs:
         WORLD_NAME: ${{ inputs.world_name }}
         ACCESS_TOKEN: ${{ inputs.access_token }}
       run: |
-        echo $WORLD_NAME
-        echo $WORLD_NAME
-        echo $WORLD_NAME
-        echo $WORLD_NAME
-        echo $WORLD_NAME
-        echo $WORLD_NAME
-        echo $WORLD_NAME
-        response=$(curl --location "https://api.helixgame.com/v1/worlds/${WORLD_NAME}" --header "Token: ${ACCESS_TOKEN}")
-        echo $response
+        response=$(curl --location "https://api.helixgame.com/v1/world/${WORLD_NAME}" --header "Token: ${ACCESS_TOKEN}")
         echo "world_id=$(echo $response | jq -r '.payload.id')" >> $GITHUB_OUTPUT
 
     - name: Request presigned URL
@@ -55,7 +47,7 @@ runs:
         ACCESS_TOKEN: ${{ inputs.access_token }}
         WORLD_ID: ${{ steps.presigned_url.outputs.get_world_id.world_id }}
       run: |
-        response=$(curl --location "https://api.helixgame.com/v1/worlds/upload/packages/${WORLD_ID}" \
+        response=$(curl --location "https://api.helixgame.com/v1/world/upload/packages/${WORLD_ID}" \
           --header "Token: ${ACCESS_TOKEN}")
         echo "upload_url=$(echo $response | jq -r '.payload.upload_url')" >> $GITHUB_OUTPUT
         echo "world_url=$(echo $response | jq -r '.payload.world_url')" >> $GITHUB_OUTPUT
@@ -76,7 +68,7 @@ runs:
         WORLD_URL: ${{ steps.presigned_url.outputs.world_url }}
         WORLD_ID: ${{ steps.presigned_url.outputs.get_world_id.world_id }}
       run: |
-        curl --location 'https://api.helixgame.com/v1/worlds/upload/packages/finish' \
+        curl --location 'https://api.helixgame.com/v1/world/upload/packages/finish' \
           --header "Content-Type: application/json" \
           --header "Token: ${ACCESS_TOKEN}" \
           --data "{\"url\": \"${WORLD_URL}\",\"name\": \"${WORLD_ID}\"}"
