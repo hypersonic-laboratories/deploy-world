@@ -48,6 +48,16 @@ runs:
         WORLD_ID: ${{ steps.get_world_id.outputs.world_id }}
       run: |
         response=$(curl --location "https://api.helixgame.com/v1/world/upload/packages/${WORLD_ID}" --header "Token: ${ACCESS_TOKEN}")
+        code=$(echo $response | jq -r '.code')
+        message=$(echo $response | jq -r '.message')
+        if [ "$code" != "0" ]; then
+          if [ "$message" == "world corrupted" ]; then
+            echo "Error: Make sure you've created this world on the HELIX Hub first: https://hub.helixgame.com/creations/worlds"
+          else
+            echo "Error: Server returned error code $code with message '$message'"
+          fi
+          exit 1
+        fi
         echo "upload_url=$(echo $response | jq -r '.payload.upload_url')" >> $GITHUB_OUTPUT
         echo "world_url=$(echo $response | jq -r '.payload.world_url')" >> $GITHUB_OUTPUT
 
