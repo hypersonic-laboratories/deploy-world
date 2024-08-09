@@ -1,13 +1,13 @@
-# Deploy Helix World
+# Deploy HELIX World
 
-Tired of zipping your Packages from your world, drag'n'drop them into Hub and not knowing exactly if you are doing it right?. This action will automatically zip your world and upload it to the Helix Platform.
+This Github Action will automatically zip your world and upload it as a new version to HELIX.
 
-## Using this your repository
+## Using this Action
 
-In your other repository, create a workflow file that uses the custom action and provides the `world_name` and `access_token` as an input. For example, in `.github/workflows/upload.yml`:
+In your development repository, create a workflow file in `.github/workflows` that utilizes this Github Action and provides `world_name` and `access_token` as inputs. For example, in `.github/workflows/upload.yml`:
 
 ```yaml
-name: Upload World to Helix
+name: Deploy World to HELIX
 
 on:
   push:
@@ -27,9 +27,9 @@ jobs:
 
 ```
 
-## Folder Structure
+## Recommended Repository Structure
 
-Since this action uploads a world to depot, it should be structured as follows:
+Since this Action uploads your world to HELIX, we recommend structuring your repository as follows:
 
 
 ```
@@ -54,7 +54,7 @@ Since this action uploads a world to depot, it should be structured as follows:
 └── .github/workflows/upload.yml
 ```
 
-This action will Pack the Packages folder and sent it to the depot.
+This Action will pack the Packages folder and upload it to HELIX.
 
 
 ## Setting Up Secrets
