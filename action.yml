@@ -35,8 +35,15 @@ runs:
       env:
         PACKAGES_PATH: ${{ inputs.packages_path || '.' }}
       run: |
-          cd $PACKAGES_PATH
+        ORIGINAL_CWD=$(pwd)
+        cd "$PACKAGES_PATH"
+        if [ -d "Packages" ]; then
           zip -r main.zip Packages
+          mv main.zip "$ORIGINAL_CWD"
+        else
+          echo "Directory 'Packages' does not exist in $PACKAGES_PATH"
+          exit 1
+        fi
 
     - name: Get World ID
       id: get_world_id
