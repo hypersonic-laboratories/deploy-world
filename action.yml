@@ -9,6 +9,10 @@ inputs:
     description: 'Name of the world to upload. Make sure you already have this world created'
     required: true
     type: string
+  packages_path:
+    description: 'Path to the packages directory. Defaults to the current directory'
+    required: false
+    type: string
 outputs: {}
 runs:
   using: 'composite'
@@ -28,7 +32,11 @@ runs:
 
     - name: Zip repository
       shell: bash
-      run: zip -r main.zip Packages
+      env:
+        PACKAGES_PATH: ${{ inputs.packages_path || '.' }}
+      run: |
+          cd $PACKAGES_PATH
+          zip -r main.zip Packages
 
     - name: Get World ID
       id: get_world_id
