@@ -39,7 +39,7 @@ runs:
         cd "$PACKAGES_PATH"
         if [ -d "Packages" ]; then
           zip -r main.zip Packages
-          mv main.zip "$ORIGINAL_CWD"
+          mv main.zip "$ORIGINAL_CWD" || true
         else
           echo "Directory 'Packages' does not exist in $PACKAGES_PATH"
           exit 1
