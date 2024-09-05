@@ -18,7 +18,15 @@ runs:
   using: 'composite'
   steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
+      with:
+        submodules: true
+        fetch-depth: 1 
+
+    - name: Update Submodules
+      run: |
+         git submodule sync
+         git submodule update --init --recursive --remote
 
     - name: Install jq
       shell: bash
