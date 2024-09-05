@@ -24,6 +24,7 @@ runs:
         fetch-depth: 1 
 
     - name: Update Submodules
+      shell: bash
       run: |
          git submodule sync
          git submodule update --init --recursive --remote
