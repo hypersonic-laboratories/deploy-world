@@ -29,6 +29,7 @@ runs:
         fetch-depth: 1 
 
     - name: Set up Git for submodule access
+      shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token || '' }}
       run: |
