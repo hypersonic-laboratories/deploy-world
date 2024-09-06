@@ -13,6 +13,11 @@ inputs:
     description: 'Path to the packages directory. Defaults to the current directory'
     required: false
     type: string
+  github_token:
+    description: 'Github token for authentication. Can be generated at Account -> Settings'
+    required: false
+    type: string
+
 outputs: {}
 runs:
   using: 'composite'
@@ -20,8 +25,19 @@ runs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
-        submodules: true
+        submodules: false
         fetch-depth: 1 
+
+    - name: Set up Git for submodule access
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token || '' }}
+      run: |
+        if [ -z "$GITHUB_TOKEN" ]; then
+          echo "Skipping git setup"
+        else
+          echo "Configuring git for private github repositories"
+          git config --global url."https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/".insteadOf "https://github.com/"
+        fi
 
     - name: Update Submodules
       shell: bash
