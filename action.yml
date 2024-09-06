@@ -13,8 +13,8 @@ inputs:
     description: 'Path to the packages directory. Defaults to the current directory'
     required: false
     type: string
-  pat_token:
-    description: 'Personal github access token for authentication. Can be generated at Account -> Settings'
+  private_ssh_key:
+    description: 'Private SSH key for authentication in github'
     required: false
     type: string
 
@@ -31,7 +31,7 @@ runs:
     - name: Set up Git for submodule access
       shell: bash
       env:
-        PRIVATE_SSH_KEY: ${{ inputs.private_ssh_key || '' }}
+        PRIVATE_SSH_KEY: ${{ inputs.private_ssh_key }}
       run: |
         if [ -z "$PRIVATE_SSH_KEY" ]; then
           echo "Skipping private repository setup"
