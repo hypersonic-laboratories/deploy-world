@@ -22,12 +22,6 @@ outputs: {}
 runs:
   using: 'composite'
   steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        submodules: false
-        fetch-depth: 1 
-
     - name: Set up Git for submodule access
       shell: bash
       env:
@@ -41,11 +35,11 @@ runs:
           ssh-add - <<< "$PRIVATE_SSH_KEY"
         fi
 
-    - name: Update Submodules
-      shell: bash
-      run: |
-         git submodule sync
-         git submodule update --init --recursive --remote
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: true
+        fetch-depth: 1 
 
     - name: Install jq
       shell: bash
