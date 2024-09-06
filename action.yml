@@ -49,6 +49,7 @@ runs:
 
 
     - name: Find and delete .git and .github folders
+      shell: bash
       run: |
         echo "Searching for .git and .github folders"
         find . -type d -name ".git" -exec rm -rf {} +
