@@ -47,11 +47,13 @@ runs:
       shell: bash
       run: sudo apt-get install -y jq
 
-    - name: Remove .files
-      shell: bash
+
+    - name: Find and delete .git and .github folders
       run: |
-        rm -rf .git
-        rm -rf .github
+        echo "Searching for .git and .github folders"
+        find . -type d -name ".git" -exec rm -rf {} +
+        find . -type d -name ".github" -exec rm -rf {} +
+        echo "Folders deleted successfully!"
 
 
     - name: Zip repository
