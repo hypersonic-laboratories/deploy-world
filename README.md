@@ -22,8 +22,16 @@ jobs:
       - name: Use deploy world action
         uses: hypersonic-laboratories/deploy-world@main
         with:
+          # Required inputs:
           access_token: ${{ secrets.ACCESS_TOKEN }}
           world_name: 'my-world-name'
+
+          # Optional inputs:
+          # this Action supports access to private repositories using deploy keys
+          private_ssh_key: ${{ secrets.PRIVATE_SSH_KEY }}
+
+          # If your Packages folder is in another place you can specify it here 
+          packages_path: './Packages'
 
 ```
 
