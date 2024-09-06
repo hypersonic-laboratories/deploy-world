@@ -13,8 +13,8 @@ inputs:
     description: 'Path to the packages directory. Defaults to the current directory'
     required: false
     type: string
-  github_token:
-    description: 'Github token for authentication. Can be generated at Account -> Settings'
+  pat_token:
+    description: 'Personal github access token for authentication. Can be generated at Account -> Settings'
     required: false
     type: string
 
@@ -31,13 +31,13 @@ runs:
     - name: Set up Git for submodule access
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ inputs.github_token || '' }}
+        PAT_TOKEN: ${{ inputs.pat_token || '' }}
       run: |
-        if [ -z "$GITHUB_TOKEN" ]; then
+        if [ -z "$PAT_TOKEN" ]; then
           echo "Skipping git setup"
         else
           echo "Configuring git for private github repositories"
-          git config --global url."https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/".insteadOf "https://github.com/"
+          git config --global url."https://$GITHUB_ACTOR:$PAT_TOKEN@github.com/".insteadOf "https://github.com/"
         fi
 
     - name: Update Submodules
