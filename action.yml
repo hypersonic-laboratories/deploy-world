@@ -22,13 +22,7 @@ outputs: {}
 runs:
   using: 'composite'
   steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        submodules: true
-        fetch-depth: 1 
-
-    - name: Update Submodules
+    - name: Set up Git for submodule access
       shell: bash
       env:
         PRIVATE_SSH_KEY: ${{ inputs.private_ssh_key }}
@@ -40,8 +34,18 @@ runs:
           eval `ssh-agent -s`
           ssh-add - <<< "$PRIVATE_SSH_KEY"
         fi
-        git submodule sync
-        git submodule update --init --recursive --remote
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: true
+        fetch-depth: 1 
+
+    - name: Update Submodules
+      shell: bash
+      run: |
+         git submodule sync
+         git submodule update --init --recursive --remote
 
     - name: Install jq
       shell: bash
