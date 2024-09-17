@@ -33,6 +33,9 @@ jobs:
           # If your Packages folder is in another place you can specify it here 
           packages_path: './Packages'
 
+          # You can change the default master endpoint to staging if needed
+          master_endpoint: 'https://dev.helixgame.com/v1'
+
 ```
 
 ## Recommended Repository Structure
