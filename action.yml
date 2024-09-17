@@ -95,7 +95,7 @@ runs:
         WORLD_ID: ${{ steps.get_world_id.outputs.world_id }}
         MASTER_ENDPOINT: ${{ inputs.master_endpoint || 'https://api.helixgame.com/v1' }}
       run: |
-        response=$(curl --location "${MASTER_ENDPOINT}/v1/world/upload/packages/${WORLD_ID}" --header "Token: ${ACCESS_TOKEN}")
+        response=$(curl --location "${MASTER_ENDPOINT}/world/upload/packages/${WORLD_ID}" --header "Token: ${ACCESS_TOKEN}")
         code=$(echo $response | jq -r '.code')
         message=$(echo $response | jq -r '.message')
         if [ "$code" != "0" ]; then
@@ -126,5 +126,5 @@ runs:
         WORLD_ID: ${{ steps.get_world_id.outputs.world_id }}
         MASTER_ENDPOINT: ${{ inputs.master_endpoint || 'https://api.helixgame.com/v1' }}
       run: |
-        curl --location "${MASTER_ENDPOINT}/v1/world/upload/packages/finish?url=${WORLD_URL}&world_id=${WORLD_ID}" --header "Token: ${ACCESS_TOKEN}"
+        curl --location "${MASTER_ENDPOINT}/world/upload/packages/finish?url=${WORLD_URL}&world_id=${WORLD_ID}" --header "Token: ${ACCESS_TOKEN}"
 
