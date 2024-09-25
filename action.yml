@@ -37,7 +37,7 @@ runs:
       with:
         submodules: false
         fetch-depth: 1
-        ref: "$REF"
+        ref: ${{ env.REF }}
 
     - name: Update Submodules
       shell: bash
