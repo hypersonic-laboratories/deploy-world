@@ -21,6 +21,10 @@ inputs:
     description: 'Defaults to https://api.helixgame.com/v1'
     required: false
     type: string
+  ref:
+    description: 'Optional git ref to checkout to'
+    required: false
+    type: string
 
 outputs: {}
 runs:
@@ -28,9 +32,12 @@ runs:
   steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      env:
+        REF: ${{ inputs.ref || '' }}
       with:
         submodules: false
-        fetch-depth: 1 
+        fetch-depth: 1
+        ref: "$REF"
 
     - name: Update Submodules
       shell: bash
