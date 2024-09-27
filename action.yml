@@ -102,7 +102,7 @@ runs:
       shell: bash
       if: ${{ inputs.world_name }} != ''
       env:
-        WORLD_NAME: ${{ inputs.world_name }}
+        WORLD_NAME: ${{ inputs.world_name || steps.create_world.outputs.world_name }}
         WORLD_ID: ${{ steps.create_world.outputs.world_id }}
         ACCESS_TOKEN: ${{ inputs.access_token }}
         MASTER_ENDPOINT: ${{ inputs.master_endpoint || 'https://api.helixgame.com/v1' }}
