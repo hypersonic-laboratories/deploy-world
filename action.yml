@@ -88,12 +88,12 @@ runs:
         ACCESS_TOKEN: ${{ inputs.access_token }}
         MASTER_ENDPOINT: ${{ inputs.master_endpoint }}
       run: |
-        echo "Creating new world"
-        RANDOM_DESCRIPTION=$(head /dev/urandom | base64 | head -c 12)
+        RANDOM_DESCRIPTION=$(head /dev/urandom | base64 | head -c 32)
         RANDOM_TITLE=$(head /dev/urandom | base64 | head -c 8)
         echo $RANDOM_TITLE
         echo $RANDOM_DESCRIPTION
         response=$(curl --location "${MASTER_ENDPOINT}/world" --header "Token: ${ACCESS_TOKEN}" --data "{\"description\": \"$RANDOM_DESCRIPTION\", \"title\": \"$RANDOM_TITLE\"}")
+        echo $response
         echo "world_id=$(echo $response | jq -r '.payload.id')" >> $GITHUB_OUTPUT
 
     - name: Get World ID
