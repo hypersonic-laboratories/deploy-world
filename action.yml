@@ -93,7 +93,7 @@ runs:
         MASTER_ENDPOINT: ${{ inputs.master_endpoint }}
       run: |
         RANDOM_DESCRIPTION=$(head /dev/urandom | base64 | head -c 32)
-        RANDOM_TITLE=$(head /dev/urandom | base64 | head -c 8)
+        RANDOM_TITLE="TEMPWORLD"
         response=$(curl --location "${MASTER_ENDPOINT}/world" --header 'Content-Type: application/json' --header "Token: ${ACCESS_TOKEN}" --data "{\"description\": \"$RANDOM_DESCRIPTION\",\"title\": \"$RANDOM_TITLE\"}")
         echo "world_id=$(echo $response | jq -r '.payload.id')" >> $GITHUB_OUTPUT
         echo "world_name=$(echo $response | jq -r '.payload.name')" >> $GITHUB_OUTPUT
