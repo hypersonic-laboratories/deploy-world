@@ -22,6 +22,7 @@ inputs:
     description: 'Optional git ref to checkout to'
     required: false
     default: ''
+
 outputs:
   world_id:
     description: "World ID that was uploaded"
@@ -90,10 +91,7 @@ runs:
       run: |
         RANDOM_DESCRIPTION=$(head /dev/urandom | base64 | head -c 32)
         RANDOM_TITLE=$(head /dev/urandom | base64 | head -c 8)
-        echo $RANDOM_TITLE
-        echo $RANDOM_DESCRIPTION
-        response=$(curl --location "${MASTER_ENDPOINT}/world" --header "Token: ${ACCESS_TOKEN}" --data "{\"description\": \"$RANDOM_DESCRIPTION\", \"title\": \"$RANDOM_TITLE\"}")
-        echo $response
+        response=$(curl --location "${MASTER_ENDPOINT}/world" --header 'Content-Type: application/json' --header "Token: ${ACCESS_TOKEN}" --data "{\"description\": \"$RANDOM_DESCRIPTION\",\"title\": \"$RANDOM_TITLE\"}")
         echo "world_id=$(echo $response | jq -r '.payload.id')" >> $GITHUB_OUTPUT
 
     - name: Get World ID
@@ -104,7 +102,13 @@ runs:
         WORLD_NAME: ${{ inputs.world_name }}
         ACCESS_TOKEN: ${{ inputs.access_token }}
         MASTER_ENDPOINT: ${{ inputs.master_endpoint || 'https://api.helixgame.com/v1' }}
+        WORLD_ID: ${{ steps.get_world_id.outputs.world_id }}
       run: |
+        if [ "$WORLD_ID" != "" ]; then
+          echo "World ID already set"
+          echo "world_id=$WORLD_ID" >> $GITHUB_OUTPUT
+          exit 0
+        fi
         response=$(curl --location "${MASTER_ENDPOINT}/world/${WORLD_NAME}" --header "Token: ${ACCESS_TOKEN}")
         echo "world_id=$(echo $response | jq -r '.payload.id')" >> $GITHUB_OUTPUT
 
