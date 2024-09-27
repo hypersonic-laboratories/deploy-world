@@ -1,4 +1,5 @@
 name: 'Deploy Helix World'
+
 description: 'Uploads a Helix automatically'
 inputs:
   access_token:
@@ -22,7 +23,6 @@ inputs:
     description: 'Optional git ref to checkout to'
     required: false
     default: ''
-
 outputs:
   world_id:
     description: "World ID that was uploaded"
@@ -115,6 +115,7 @@ runs:
         fi
         response=$(curl --location "${MASTER_ENDPOINT}/world/${WORLD_NAME}" --header "Token: ${ACCESS_TOKEN}")
         echo "world_id=$(echo $response | jq -r '.payload.id')" >> $GITHUB_OUTPUT
+        echo "world_name=$(echo $response | jq -r '.payload.name')" >> $GITHUB_OUTPUT
 
     - name: Request presigned URL
       id: presigned_url
