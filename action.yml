@@ -23,6 +23,81 @@ inputs:
     description: 'Optional git ref to checkout to'
     required: false
     default: ''
+  gamemap:
+    description: "Game map"
+    required: false
+  gamemode:
+    description: "Game mode"
+    required: false
+  title:
+    description: "Title of the game"
+    required: true
+  description:
+    description: "Description of the game"
+    required: false
+  max_players:
+    description: "Maximum number of players"
+    required: false
+  type_id:
+    description: "Type ID"
+    required: false
+  metadata:
+    description: "Metadata for the game"
+    required: false
+  public_settings:
+    description: "Public settings"
+    required: false
+  tags:
+    description: "Comma-separated list of tags"
+    required: false
+  instanceable:
+    description: "Whether the game is instanceable"
+    required: false
+  matchmaking:
+    description: "Enable matchmaking"
+    required: false
+  min_players:
+    description: "Minimum number of players"
+    required: false
+  password:
+    description: "Game password"
+    required: false
+  allow_universal_items:
+    description: "Allow universal items"
+    required: false
+  max_visitor:
+    description: "Maximum visitors"
+    required: false
+  fqdn:
+    description: "Fully qualified domain name"
+    required: false
+  nft_allowlist:
+    description: "NFT allowlist"
+    required: false
+  use_nft_allowlist:
+    description: "Use NFT allowlist"
+    required: false
+  allowlist:
+    description: "Enable allowlist"
+    required: false
+  loading_screen:
+    description: "Loading screen"
+    required: false
+  is_public:
+    description: "Is the world public"
+    required: false
+  links:
+    description: "Links for what? I don't know I think it is like social media links"
+    required: false
+  package_deps:
+    description: "Package dependencies"
+    required: false
+  full_description:
+    description: "Full description of the game"
+    required: false
+  can_join_during_match:
+    description: "Can players join during match"
+    required: false
 outputs:
   world_id:
     description: "World ID that was uploaded"
@@ -91,10 +166,65 @@ runs:
       env:
         ACCESS_TOKEN: ${{ inputs.access_token }}
         MASTER_ENDPOINT: ${{ inputs.master_endpoint }}
+        GAMEMAP: ${{ inputs.gamemap }}
+        GAMEMODE: ${{ inputs.gamemode }}
+        TITLE: ${{ inputs.title }}
+        DESCRIPTION: ${{ inputs.description }}
+        MAX_PLAYERS: ${{ inputs.max_players }}
+        TYPE_ID: ${{ inputs.type_id }}
+        METADATA: ${{ inputs.metadata }}
+        PUBLIC_SETTINGS: ${{ inputs.public_settings }}
+        TAGS: ${{ inputs.tags }}
+        INSTANCEABLE: ${{ inputs.instanceable }}
+        MATCHMAKING: ${{ inputs.matchmaking }}
+        MIN_PLAYERS: ${{ inputs.min_players }}
+        PASSWORD: ${{ inputs.password }}
+        ALLOW_UNIVERSAL_ITEMS: ${{ inputs.allow_universal_items }}
+        MAX_VISITOR: ${{ inputs.max_visitor }}
+        FQDN: ${{ inputs.fqdn }}
+        NFT_ALLOWLIST: ${{ inputs.nft_allowlist }}
+        USE_NFT_ALLOWLIST: ${{ inputs.use_nft_allowlist }}
+        ALLOWLIST: ${{ inputs.allowlist }}
+        LOADING_SCREEN: ${{ inputs.loading_screen }}
+        IS_PUBLIC: ${{ inputs.is_public }}
+        LINKS: ${{ inputs.links }}
+        PACKAGE_DEPS: ${{ inputs.package_deps }}
+        FULL_DESCRIPTION: ${{ inputs.full_description }}
+        CAN_JOIN_DURING_MATCH: ${{ inputs.can_join_during_match }}
       run: |
         RANDOM_DESCRIPTION=$(head /dev/urandom | base64 | head -c 32)
-        RANDOM_TITLE="TEMPWORLD"
-        response=$(curl --location "${MASTER_ENDPOINT}/world" --header 'Content-Type: application/json' --header "Token: ${ACCESS_TOKEN}" --data "{\"description\": \"$RANDOM_DESCRIPTION\",\"title\": \"$RANDOM_TITLE\"}")
+        RANDOM_TITLE=$(head /dev/urandom | base64 | head -c 16)
+        [[ -z "$TITLE" ]] && TITLE=$RANDOM_TITLE
+        [[ -z "$DESCRIPTION" ]] && DESCRIPTION=$RANDOM_DESCRIPTION
+        json_payload="{"
+        [ ! -z "$GAMEMAP" ] && json_payload+="\"gamemap\": \"$GAMEMAP\","
+        [ ! -z "$GAMEMODE" ] && json_payload+="\"gamemode\": \"$GAMEMODE\","
+        [ ! -z "$TITLE" ] && json_payload+="\"title\": \"$TITLE\","
+        [ ! -z "$DESCRIPTION" ] && json_payload+="\"description\": \"$DESCRIPTION\","
+        [ ! -z "$MAX_PLAYERS" ] && json_payload+="\"max_players\": $MAX_PLAYERS,"
+        [ ! -z "$TYPE_ID" ] && json_payload+="\"type_id\": $TYPE_ID,"
+        [ ! -z "$METADATA" ] && json_payload+="\"metadata\": $METADATA,"
+        [ ! -z "$PUBLIC_SETTINGS" ] && json_payload+="\"public_settings\": $PUBLIC_SETTINGS,"
+        [ ! -z "$TAGS" ] && json_payload+="\"tags\": $(echo "$TAGS" | jq -R '[split(",")]'),"
+        [ ! -z "$INSTANCEABLE" ] && json_payload+="\"instanceable\": $INSTANCEABLE,"
+        [ ! -z "$MATCHMAKING" ] && json_payload+="\"matchmaking\": $MATCHMAKING,"
+        [ ! -z "$MIN_PLAYERS" ] && json_payload+="\"min_players\": $MIN_PLAYERS,"
+        [ ! -z "$PASSWORD" ] && json_payload+="\"password\": \"$PASSWORD\","
+        [ ! -z "$ALLOW_UNIVERSAL_ITEMS" ] && json_payload+="\"allow_universal_items\": $ALLOW_UNIVERSAL_ITEMS,"
+        [ ! -z "$MAX_VISITOR" ] && json_payload+="\"max_visitor\": $MAX_VISITOR,"
+        [ ! -z "$FQDN" ] && json_payload+="\"fqdn\": \"$FQDN\","
+        [ ! -z "$NFT_ALLOWLIST" ] && json_payload+="\"nft_allowlist\": \"$NFT_ALLOWLIST\","
+        [ ! -z "$USE_NFT_ALLOWLIST" ] && json_payload+="\"use_nft_allowlist\": $USE_NFT_ALLOWLIST,"
+        [ ! -z "$ALLOWLIST" ] && json_payload+="\"allowlist\": $ALLOWLIST,"
+        [ ! -z "$LOADING_SCREEN" ] && json_payload+="\"loading_screen\": \"$LOADING_SCREEN\","
+        [ ! -z "$IS_PUBLIC" ] && json_payload+="\"is_public\": $IS_PUBLIC,"
+        [ ! -z "$LINKS" ] && json_payload+="\"links\": $LINKS,"
+        [ ! -z "$PACKAGE_DEPS" ] && json_payload+="\"package_deps\": $PACKAGE_DEPS,"
+        [ ! -z "$FULL_DESCRIPTION" ] && json_payload+="\"full_description\": \"$FULL_DESCRIPTION\","
+        [ ! -z "$CAN_JOIN_DURING_MATCH" ] && json_payload+="\"can_join_during_match\": $CAN_JOIN_DURING_MATCH,"
+        json_payload=$(echo "$json_payload" | sed 's/,$//')"}"
+        echo "Generated JSON Payload: $json_payload"
+        response=$(curl --location "${MASTER_ENDPOINT}/world" --header 'Content-Type: application/json' --header "Token: ${ACCESS_TOKEN}" --data "$json_payload")
         echo "world_id=$(echo $response | jq -r '.payload.id')" >> $GITHUB_OUTPUT
         echo "world_name=$(echo $response | jq -r '.payload.name')" >> $GITHUB_OUTPUT
 
