@@ -156,7 +156,7 @@ runs:
       shell: bash
       id: parse_toml
       env:
-        CONFIG_TOML_PATH=${{ inputs.config_toml_path }}
+        CONFIG_TOML_PATH : ${{ inputs.config_toml_path }}
       run: |
         SERVER_NAME=$(yq eval '.server.name' $CONFIG_TOML_PATH)
         SERVER_DESCRIPTION=$(yq eval '.server.description' $CONFIG_TOML_PATH)
