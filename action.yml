@@ -26,6 +26,7 @@ inputs:
   config_toml_path:
     description: '[EXPERIMENTAL] Path to config.toml to parse dependencies from'
     required: false
+    default: ''
 
   # Here be dragons
   gamemap:
