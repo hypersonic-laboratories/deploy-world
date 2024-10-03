@@ -261,7 +261,7 @@ runs:
         [ ! -z "$CAN_JOIN_DURING_MATCH" ] && json_payload+="\"can_join_during_match\": $CAN_JOIN_DURING_MATCH,"
         json_payload=$(echo "$json_payload" | sed 's/,$//')"}"
         echo "Generated JSON Payload: $json_payload"
-        response=$(curl --location "${MASTER_ENDPOINT}/world" --header 'Content-Type: application/json' --header "Token: ${ACCESS_TOKEN}" --data "$json_payload")
+        response=$(curl -S --location "${MASTER_ENDPOINT}/world" --header 'Content-Type: application/json' --header "Token: ${ACCESS_TOKEN}" --data "$json_payload")
         echo "world_id=$(echo $response | jq -r '.payload.id')" >> $GITHUB_OUTPUT
         echo "world_name=$(echo $response | jq -r '.payload.name')" >> $GITHUB_OUTPUT
 
@@ -275,7 +275,7 @@ runs:
         MASTER_ENDPOINT: ${{ inputs.master_endpoint || 'https://api.helixgame.com/v1' }}
       run: |
         if [ "$WORLD_ID" != "" ]; then
-          response=$(curl --location "${MASTER_ENDPOINT}/world/${WORLD_NAME}" --header "Token: ${ACCESS_TOKEN}")
+          response=$(curl -S --location "${MASTER_ENDPOINT}/world/${WORLD_NAME}" --header "Token: ${ACCESS_TOKEN}")
           echo "world_id=$(echo $response | jq -r '.payload.id')" >> $GITHUB_OUTPUT
           echo "world_name=$(echo $response | jq -r '.payload.name')" >> $GITHUB_OUTPUT
           exit 0
@@ -291,7 +291,7 @@ runs:
         WORLD_ID: ${{ steps.get_world_info.outputs.world_id }}
         MASTER_ENDPOINT: ${{ inputs.master_endpoint }}
       run: |
-        response=$(curl --location "${MASTER_ENDPOINT}/world/upload/packages/${WORLD_ID}" --header "Token: ${ACCESS_TOKEN}")
+        response=$(curl -S --location "${MASTER_ENDPOINT}/world/upload/packages/${WORLD_ID}" --header "Token: ${ACCESS_TOKEN}")
         code=$(echo $response | jq -r '.code')
         message=$(echo $response | jq -r '.message')
         if [ "$code" != "0" ]; then
@@ -310,7 +310,7 @@ runs:
       env:
         UPLOAD_URL: ${{ steps.presigned_url.outputs.upload_url }}
       run: |
-        curl --location --request PUT "${UPLOAD_URL}" \
+        curl -S --location --request PUT "${UPLOAD_URL}" \
           --header "Content-Type: application/zip" \
           --data-binary "@main.zip"
 
@@ -323,7 +323,7 @@ runs:
         MASTER_ENDPOINT: ${{ inputs.master_endpoint || 'https://api.helixgame.com/v1' }}
       run: |
         echo $WORLD_ID
-        curl --location "${MASTER_ENDPOINT}/world/upload/packages/finish?url=${WORLD_URL}&world_id=${WORLD_ID}" --header "Token: ${ACCESS_TOKEN}"
+        curl -S --location "${MASTER_ENDPOINT}/world/upload/packages/finish?url=${WORLD_URL}&world_id=${WORLD_ID}" --header "Token: ${ACCESS_TOKEN}"
 
     - name: Adds Assets
       id: patch_world
@@ -340,5 +340,5 @@ runs:
         json_payload+="\"assets\": \"$ASSETS\","
         json_payload=$(echo "$json_payload" | sed 's/,$//')"}"
         echo "Generated JSON Payload: $json_payload"
-        response=$(curl --location "${MASTER_ENDPOINT}/world" --header 'Content-Type: application/json' --header "Token: ${ACCESS_TOKEN}" --data "$json_payload")
+        response=$(curl -S --request PATCH --location "${MASTER_ENDPOINT}/world" --header 'Content-Type: application/json' --header "Token: ${ACCESS_TOKEN}" --data "$json_payload")
 
