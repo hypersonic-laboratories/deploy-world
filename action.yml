@@ -152,7 +152,7 @@ runs:
         echo "Folders deleted successfully!"
 
     - name: Parse Config.toml
-      if: ${{ inputs.config_toml_path }} != ''
+      if: ${{ inputs.config_toml_path != '' }}
       shell: bash
       id: parse_toml
       env:
@@ -327,7 +327,7 @@ runs:
 
     - name: Adds Assets
       id: patch_world
-      if: ${{ steps.parse_toml.outputs.assets }} != ''
+      if: ${{ steps.parse_toml.outputs.assets != '' }}
       shell: bash
       env:
         ACCESS_TOKEN: ${{ inputs.access_token }}
