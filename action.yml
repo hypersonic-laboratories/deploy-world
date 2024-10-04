@@ -339,6 +339,7 @@ runs:
         WORLD_ID: ${{ steps.get_world_info.outputs.world_id || steps.create_world.outputs.world_id }}
         ASSETS: ${{ inputs.assets }}
       run: |
+        ASSETS="${ASSETS//\'/\"}"
         json_payload="{"
         json_payload+="\"id\": \"$WORLD_ID\","
         json_payload+="\"assets\": $ASSETS,"
