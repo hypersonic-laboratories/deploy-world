@@ -340,7 +340,7 @@ runs:
         ASSETS: ${{ inputs.assets }}
       run: |
         json_payload="{"
-        json_payload+="\"world_id\": \"$WORLD_ID\","
+        json_payload+="\"id\": \"$WORLD_ID\","
         json_payload+="\"assets\": $ASSETS,"
         json_payload=$(echo "$json_payload" | sed 's/,$//')"}"
         echo "Generated JSON Payload: $json_payload"
