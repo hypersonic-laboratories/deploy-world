@@ -167,7 +167,7 @@ runs:
 
     - name: Create World 
       id: create_world
-      if: ${{ inputs.world_name }} == ''
+      if: ${{ inputs.world_name == '' }}
       shell: bash
       env:
         ACCESS_TOKEN: ${{ inputs.access_token }}
