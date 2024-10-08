@@ -244,9 +244,7 @@ runs:
         ACCESS_TOKEN: ${{ inputs.access_token }}
         MASTER_ENDPOINT: ${{ inputs.master_endpoint || 'https://api.helixgame.com/v1' }}
       run: |
-        echo $WORLD_ID
         response=$(curl --no-progress-meter --location "${MASTER_ENDPOINT}/world/${WORLD_NAME}" --header "Token: ${ACCESS_TOKEN}")
-        echo $response
         echo "world_id=$(echo $response | jq -r '.payload.id')" >> $GITHUB_OUTPUT
         echo "world_name=$(echo $response | jq -r '.payload.name')" >> $GITHUB_OUTPUT
 
