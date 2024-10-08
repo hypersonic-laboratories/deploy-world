@@ -23,10 +23,6 @@ inputs:
     description: 'Optional git ref to checkout to'
     required: false
     default: ''
-  config_toml_path:
-    description: '[EXPERIMENTAL] Path to config.toml to parse dependencies from'
-    required: false
-    default: ''
 
   # Here be dragons
   gamemap:
@@ -145,7 +141,6 @@ runs:
       shell: bash
       run: |
         sudo apt-get install -y jq
-        sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq && sudo chmod +x /usr/bin/yq
 
     - name: Find and delete .git and .github folders
       shell: bash
@@ -154,35 +149,6 @@ runs:
         find . -type d -name ".git" -exec rm -rf {} +
         find . -type d -name ".github" -exec rm -rf {} +
         echo "Folders deleted successfully!"
-
-    - name: Parse Config.toml
-      if: ${{ inputs.config_toml_path != '' }}
-      shell: bash
-      id: parse_toml
-      env:
-        CONFIG_TOML_PATH : ${{ inputs.config_toml_path }}
-      run: |
-        SERVER_NAME=$(yq eval '.server.name' $CONFIG_TOML_PATH)
-        SERVER_DESCRIPTION=$(yq eval '.server.description' $CONFIG_TOML_PATH)
-        GAME_MODE=$(yq eval '.world.game_mode' $CONFIG_TOML_PATH)
-        MAP=$(yq eval '.world.map' $CONFIG_TOML_PATH)
-        PACKAGES_JSON="{"
-        for package in $(yq eval '.world.packages[]' $CONFIG_TOML_PATH); do
-          PACKAGES_JSON+="\"$package\": \"latest\","
-        done
-        PACKAGES_JSON=$(echo $PACKAGES_JSON | sed 's/,$//')"}"
-        ASSETS_ARRAY="["
-        for asset in $(yq eval '.world.assets[]' $CONFIG_TOML_PATH); do
-          ASSETS_ARRAY+="$asset,"
-        done
-        ASSETS_ARRAY=$(echo $ASSETS_ARRAY | sed 's/,$//')"]"
-        echo "world_name=$SERVER_NAME" >> $GITHUB_OUTPUT
-        echo "world_description=$SERVER_DESCRIPTION" >> $GITHUB_OUTPUT
-        echo "gamemode=$GAME_MODE" >> $GITHUB_OUTPUT
-        echo "gamemap=$MAP" >> $GITHUB_OUTPUT
-        echo "assets=$ASSETS_ARRAY" >> $GITHUB_OUTPUT
-        echo "packages=$PACKAGES_JSON" >> $GITHUB_OUTPUT
-
 
     - name: Zip repository
       shell: bash
@@ -206,10 +172,10 @@ runs:
       env:
         ACCESS_TOKEN: ${{ inputs.access_token }}
         MASTER_ENDPOINT: ${{ inputs.master_endpoint }}
-        GAMEMAP: ${{ inputs.gamemap || steps.parse_toml.outputs.gamemap }}
-        GAMEMODE: ${{ inputs.gamemode || steps.parse_toml.outputs.gamemode }}
-        TITLE: ${{ inputs.title || steps.parse_toml.outputs.world_name }}
-        DESCRIPTION: ${{ inputs.description || steps.parse_toml.outputs.world_description }}
+        GAMEMAP: ${{ inputs.gamemap }}
+        GAMEMODE: ${{ inputs.gamemode }}
+        TITLE: ${{ inputs.title  }}
+        DESCRIPTION: ${{ inputs.description  }}
         MAX_PLAYERS: ${{ inputs.max_players }}
         TYPE_ID: ${{ inputs.type_id }}
         METADATA: ${{ inputs.metadata }}
@@ -328,25 +294,4 @@ runs:
       run: |
         echo $WORLD_ID
         curl --no-progress-meter --location "${MASTER_ENDPOINT}/world/upload/packages/finish?url=${WORLD_URL}&world_id=${WORLD_ID}" --header "Token: ${ACCESS_TOKEN}"
-
-    - name: Patch World
-      id: patch_world
-      if: ${{ inputs.assets != '' || inputs.packages != '' }}
-      shell: bash
-      env:
-        ACCESS_TOKEN: ${{ inputs.access_token }}
-        MASTER_ENDPOINT: ${{ inputs.master_endpoint }}
-        WORLD_ID: ${{ steps.get_world_info.outputs.world_id || steps.create_world.outputs.world_id }}
-        ASSETS: ${{ inputs.assets }}
-        PACKAGES: ${{ inputs.packages }}
-      run: |
-        ASSETS="${ASSETS//\'/\"}"
-        json_payload="{"
-        json_payload+="\"id\": \"$WORLD_ID\","
-        [ ! -z "$PACKAGES" ] && json_payload+="\"packages\": $PACKAGES,"
-        [ ! -z "$ASSETS" ] && json_payload+="\"assets\": $ASSETS,"
-        json_payload=$(echo "$json_payload" | sed 's/,$//')"}"
-        echo "Generated JSON Payload: $json_payload"
-        response=$(curl --no-progress-meter --request PATCH --location "${MASTER_ENDPOINT}/world" --header 'Content-Type: application/json' --header "Token: ${ACCESS_TOKEN}" --data "$json_payload")
-        echo $response
 
