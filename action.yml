@@ -33,7 +33,7 @@ inputs:
     required: false
   title:
     description: "Title of the game"
-    required: true
+    required: false
   description:
     description: "Description of the game"
     required: false
