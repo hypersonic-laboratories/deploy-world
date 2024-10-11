@@ -244,9 +244,13 @@ runs:
         MASTER_ENDPOINT: ${{ inputs.master_endpoint || 'https://api.helixgame.com/v1' }}
       run: |
         response=$(curl --no-progress-meter --location "${MASTER_ENDPOINT}/world/${WORLD_NAME}" --header "Token: ${ACCESS_TOKEN}")
+        code=$(echo $response | jq -r '.code')
+        message=$(echo $response | jq -r '.message')
+        if [ "$code" != "0" ]; then
+          echo "Error: Server returned error code $code with message '$message'"
+        fi
         echo "world_id=$(echo $response | jq -r '.payload.id')" >> $GITHUB_OUTPUT
         echo "world_name=$(echo $response | jq -r '.payload.name')" >> $GITHUB_OUTPUT
-        echo "Got world info: $response"
 
     - name: Request presigned URL
       id: presigned_url
