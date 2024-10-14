@@ -9,8 +9,9 @@ inputs:
     description: 'Name of the world to upload. Make sure you already have this world created. If not set a world will be created'
     required: false
   packages_path:
-    description: 'Path to the packages directory. Defaults to the current directory'
+    description: 'Path to the Packages directory. Defaults to the current directory.'
     required: false
+    default: '.'
   master_endpoint:
     description: 'Defaults to https://api.helixgame.com/v1'
     required: false
@@ -157,15 +158,13 @@ runs:
     - name: Zip repository
       shell: bash
       env:
-        PACKAGES_PATH: ${{ inputs.packages_path || '.' }}
+        PACKAGES_PATH: ${{ inputs.packages_path }}
       run: |
-        ORIGINAL_CWD=$(pwd)
-        cd "$PACKAGES_PATH"
-        if [ -d "Packages" ]; then
-          zip -r main.zip Packages
-          mv main.zip "$ORIGINAL_CWD" || true
+        # At least 1 package exists within the 'Packages' directory?
+        if [ "$(find "$PACKAGES_PATH" -mindepth 1 -type d | wc -l)" -gt 0 ]; then
+          zip -r main.zip "$PACKAGES_PATH"
         else
-          echo "Directory 'Packages' does not exist in $PACKAGES_PATH"
+          echo "Target 'Packages' directory must contain at least 1 package."
           exit 1
         fi
 
