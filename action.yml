@@ -8,21 +8,23 @@ inputs:
   world_name:
     description: 'Name of the world to upload. Make sure you already have this world created. If not set a world will be created'
     required: false
-    default: ''
   packages_path:
     description: 'Path to the packages directory. Defaults to the current directory'
-    required: false
-  private_ssh_key:
-    description: 'Private SSH key for authentication in github'
     required: false
   master_endpoint:
     description: 'Defaults to https://api.helixgame.com/v1'
     required: false
     default: 'https://api.helixgame.com/v1'
+  checkout:
+    description: "Whether to checkout the repository. You only need this if you haven't checked out before this step or if you want a clean copy of your repo. Defaults to true."
+    required: false
+    default: true
   ref:
     description: 'Optional git ref to checkout to'
     required: false
-    default: ''
+  private_ssh_key:
+    description: 'Private SSH key for authentication in github'
+    required: false
 
   # Here be dragons
   gamemap:
@@ -115,14 +117,16 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - name: Checkout repository
+    - if: ${{ inputs.checkout }}
+      name: Checkout repository
       uses: actions/checkout@v4
       with:
         submodules: false
         fetch-depth: 1
         ref: ${{ inputs.ref }}
 
-    - name: Update Submodules
+    - if: ${{ inputs.checkout }}
+      name: Update Submodules
       shell: bash
       env:
         PRIVATE_SSH_KEY: ${{ inputs.private_ssh_key }}
@@ -293,4 +297,3 @@ runs:
       run: |
         echo $WORLD_ID
         curl --no-progress-meter --location "${MASTER_ENDPOINT}/world/upload/packages/finish?url=${WORLD_URL}&world_id=${WORLD_ID}" --header "Token: ${ACCESS_TOKEN}"
-
