@@ -118,7 +118,7 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - if: ${{ inputs.checkout }}
+    - if: inputs.checkout
       name: Checkout repository
       uses: actions/checkout@v4
       with:
@@ -126,7 +126,7 @@ runs:
         fetch-depth: 1
         ref: ${{ inputs.ref }}
 
-    - if: ${{ inputs.checkout }}
+    - if: inputs.checkout
       name: Update Submodules
       shell: bash
       env:
